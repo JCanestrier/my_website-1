@@ -147,7 +147,10 @@ hiv_life_wb &lt;- left_join(worldbank_data,life_expectancy_pivot) %&gt;%
 <pre class="r"><code>ggplot(hiv_life_wb,aes(x=hiv_prevalence,y=life_expectancy)) +
   geom_smooth() +
   geom_point(alpha=0.2)+
-  labs(title=&quot;HIV prevalence is negatively correlated with life expectancy&quot;,subtitle=&quot;Relationship between HIV prevalence and life expectancy&quot;,x=&quot;HIV prevalence (aged 15 to 49)&quot;,y=&quot;Life expectancy&quot;) +
+  labs(title=&quot;HIV prevalence is negatively correlated with life expectancy&quot;,
+       subtitle=&quot;Relationship between HIV prevalence and life expectancy&quot;,
+       x=&quot;HIV prevalence (aged 15 to 49)&quot;,
+       y=&quot;Life expectancy&quot;) +
   theme_bw()</code></pre>
 <p><img src="/blogs/Socioeconomic_files/figure-html/unnamed-chunk-3-1.png" width="624" style="display: block; margin: auto;" /></p>
 <pre class="r"><code>ggplot(hiv_life_wb,aes(x=hiv_prevalence,y=life_expectancy)) +
@@ -170,7 +173,10 @@ cor(hiv_life_wb_cleaned$hiv_prevalence,hiv_life_wb_cleaned$life_expectancy)</cod
 <pre class="r"><code>ggplot(hiv_life_wb,aes(x=NY.GDP.PCAP.KD,y=SP.DYN.TFRT.IN)) +
   geom_point(alpha=0.2,size=0.5)+
   geom_smooth(method=&quot;lm&quot;) +
-  labs(title=&quot;High socioeconomic classes have better access to contraception&quot;,subtitle=&quot;Relationship between GDP per capita and fertility rate in each region&quot;,x=&quot;GDP per capita&quot;,y=&quot;Fertility rate&quot;) +
+  labs(title=&quot;High socioeconomic classes have better access to contraception&quot;,
+       subtitle=&quot;Relationship between GDP per capita and fertility rate in each region&quot;,
+       x=&quot;GDP per capita&quot;,
+       y=&quot;Fertility rate&quot;) +
   theme_bw()+
   facet_wrap(~region,scales=&quot;free&quot;)</code></pre>
 <p><img src="/blogs/Socioeconomic_files/figure-html/unnamed-chunk-5-1.png" width="624" style="display: block; margin: auto;" /></p>
@@ -199,7 +205,10 @@ ggplot(hiv_missing,aes(x=reorder(region,hiv_na),y=hiv_na)) +
   geom_col(fill=&quot;steelblue&quot;) + 
   theme_bw() +
   coord_flip() +
-  labs(title=&quot;Europe &amp; Central Asia is the region that most misses HIV data&quot;,subtitle=&quot;Number of missing HIV prevalence observations per region&quot;, y=&quot;HIV missing data&quot;,x=&quot;&quot;)  +
+  labs(title=&quot;Europe &amp; Central Asia is the region that most misses HIV data&quot;,
+       subtitle=&quot;Number of missing HIV prevalence observations per region&quot;, 
+       y=&quot;HIV missing data&quot;,
+       x=&quot;&quot;)  +
   geom_text(aes(label=hiv_na), vjust=0.5,hjust=1.5,angle=0, color=&quot;white&quot;, size=4)</code></pre>
 <p><img src="/blogs/Socioeconomic_files/figure-html/unnamed-chunk-6-1.png" width="624" style="display: block; margin: auto;" /></p>
 <pre class="r"><code>#Plot of proportion 
@@ -207,8 +216,15 @@ ggplot(hiv_missing,aes(x=reorder(region,proportion),y=proportion)) +
   geom_col(fill=&quot;steelblue&quot;) + 
   theme_bw() +
   coord_flip() +
-  labs(title=&quot;In relative terms, East Asia &amp; Pacific is the region\nthat most misses HIV data&quot;,subtitle=&quot;Proportion of missing HIV prevalence observations per region&quot;,y=&quot;HIV missing data&quot;,x=&quot;&quot;)  +
-  geom_text(aes(label=scales::percent(proportion)), vjust=0.5,hjust=1.5,angle=0, color=&quot;white&quot;, size=4) </code></pre>
+  labs(title=&quot;In relative terms, East Asia &amp; Pacific is the region\nthat most misses HIV data&quot;,
+       subtitle=&quot;Proportion of missing HIV prevalence observations per region&quot;,y=&quot;HIV missing data&quot;,
+       x=&quot;&quot;)  +
+  geom_text(aes(label=scales::percent(proportion)), 
+            vjust=0.5,
+            hjust=1.5,
+            angle=0, 
+            color=&quot;white&quot;,
+            size=4) </code></pre>
 <p><img src="/blogs/Socioeconomic_files/figure-html/unnamed-chunk-6-2.png" width="624" style="display: block; margin: auto;" /></p>
 <blockquote>
 <p>The region that most lacks HIV data is Europe &amp; Central Asia. However, it is more relevant to compare missing data with the number of values within the data frame, since regions do not have the same number of countries. The second analysis indicates that the region with the greatest missing HIV data is East Asia &amp; Pacific (74.1% of missing data)</p>

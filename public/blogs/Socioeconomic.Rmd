@@ -80,9 +80,9 @@ countries <-  read.csv(here::here("data","countries.csv"))
 
 We will work with 3 data frames:
 
-* hiv
-* life_expectancy
-* worldbank_data
+- hiv
+- life_expectancy
+- worldbank_data
 
 We can see that hiv and life_expectancy are messy, since they contain values instead of variables in their columns. Since worldbank_data is tidy, it makes sense to tidy the data in order to manipulate it better in our analyses.
 
@@ -125,7 +125,6 @@ hiv_life_wb <- left_join(worldbank_data,life_expectancy_pivot) %>%
 #Add a region column, using the countrycode package
   mutate(region= countrycode(sourcevar = country, origin = "country.name",destination = "region"))
 
-
 ```
 
 
@@ -138,7 +137,10 @@ Let us study the relation between HIV prevalence and life expectancy
 ggplot(hiv_life_wb,aes(x=hiv_prevalence,y=life_expectancy)) +
   geom_smooth() +
   geom_point(alpha=0.2)+
-  labs(title="HIV prevalence is negatively correlated with life expectancy",subtitle="Relationship between HIV prevalence and life expectancy",x="HIV prevalence (aged 15 to 49)",y="Life expectancy") +
+  labs(title="HIV prevalence is negatively correlated with life expectancy",
+       subtitle="Relationship between HIV prevalence and life expectancy",
+       x="HIV prevalence (aged 15 to 49)",
+       y="Life expectancy") +
   theme_bw()
 ```
 
@@ -165,7 +167,10 @@ cor(hiv_life_wb_cleaned$hiv_prevalence,hiv_life_wb_cleaned$life_expectancy)
 ggplot(hiv_life_wb,aes(x=NY.GDP.PCAP.KD,y=SP.DYN.TFRT.IN)) +
   geom_point(alpha=0.2,size=0.5)+
   geom_smooth(method="lm") +
-  labs(title="High socioeconomic classes have better access to contraception",subtitle="Relationship between GDP per capita and fertility rate in each region",x="GDP per capita",y="Fertility rate") +
+  labs(title="High socioeconomic classes have better access to contraception",
+       subtitle="Relationship between GDP per capita and fertility rate in each region",
+       x="GDP per capita",
+       y="Fertility rate") +
   theme_bw()+
   facet_wrap(~region,scales="free")
 
@@ -199,7 +204,10 @@ ggplot(hiv_missing,aes(x=reorder(region,hiv_na),y=hiv_na)) +
   geom_col(fill="steelblue") + 
   theme_bw() +
   coord_flip() +
-  labs(title="Europe & Central Asia is the region that most misses HIV data",subtitle="Number of missing HIV prevalence observations per region", y="HIV missing data",x="")  +
+  labs(title="Europe & Central Asia is the region that most misses HIV data",
+       subtitle="Number of missing HIV prevalence observations per region", 
+       y="HIV missing data",
+       x="")  +
   geom_text(aes(label=hiv_na), vjust=0.5,hjust=1.5,angle=0, color="white", size=4)
 
 #Plot of proportion 
@@ -207,10 +215,15 @@ ggplot(hiv_missing,aes(x=reorder(region,proportion),y=proportion)) +
   geom_col(fill="steelblue") + 
   theme_bw() +
   coord_flip() +
-  labs(title="In relative terms, East Asia & Pacific is the region\nthat most misses HIV data",subtitle="Proportion of missing HIV prevalence observations per region",y="HIV missing data",x="")  +
-  geom_text(aes(label=scales::percent(proportion)), vjust=0.5,hjust=1.5,angle=0, color="white", size=4) 
-
-
+  labs(title="In relative terms, East Asia & Pacific is the region\nthat most misses HIV data",
+       subtitle="Proportion of missing HIV prevalence observations per region",y="HIV missing data",
+       x="")  +
+  geom_text(aes(label=scales::percent(proportion)), 
+            vjust=0.5,
+            hjust=1.5,
+            angle=0, 
+            color="white",
+            size=4) 
 
 ```
 
