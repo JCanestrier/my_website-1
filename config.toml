@@ -81,7 +81,7 @@ disqusShortname = ""
       title = "Relationship between socioeconomic variables"
       subtitle = "Correlation analysis"
       image = "Gapminder.jpg"
-      url = "blogs/Gapminder"
+      url = "blogs/socioeconomic"
 
     [[params.tiles.showcase]]
       title = "Analysis of IMDB Ratings"
