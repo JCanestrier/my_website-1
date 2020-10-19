@@ -125,10 +125,6 @@ hiv_life_wb <- left_join(worldbank_data,life_expectancy_pivot) %>%
 #Add a region column, using the countrycode package
   mutate(region= countrycode(sourcevar = country, origin = "country.name",destination = "region"))
 
-#Display the first five line of the final table
-hiv_life_wb %>% head() %>% kbl(digits = 2) %>%
-kable_material(c("striped","hover")) %>%
-kable_styling(fixed_thead = T, full_width= F)  
 
 ```
 

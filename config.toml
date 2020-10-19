@@ -103,6 +103,8 @@ disqusShortname = ""
     enable = true
     title = "About me"
     subtitle = """I am an Economics graduate from the University cattolica of Milan with deep experience in the fintech industry, who is currently delving into financial analysis at London Business School with the aspiration of bringing meaningful insights and lasting impact to businesses."""
+    buttontext = "Read my blog"
+    url = "Blogs"
 
 
   # Contact section
@@ -122,7 +124,7 @@ disqusShortname = ""
     # - send a dummy email yourself to confirm your account
     # - click the confirm link in the email from www.formspree.io
     # - you're done. Happy mailing!
-    # formEmail = "example@domain.com"
+    formEmail = "lvonloeper.mfa2021@london.edu"
 
     # Contact Section
     # You can add multiple emails, phone numbers, or addresses
