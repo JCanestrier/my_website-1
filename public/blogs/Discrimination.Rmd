@@ -73,14 +73,6 @@ glimpse(omega)
 
 The data frame `omega`  contains the salaries for the sample of 50 executives in the company. Can we conclude that there is a significant difference between the salaries of the male and female executives?
 
-Note that we will perform different types of analyses, and check whether they all lead to the same conclusion 
-
-.	Confidence intervals
-.	Hypothesis testing
-.	Correlation analysis
-.	Regression
-
-
 We will calculate summary statistics on salary by gender. Also, we will create and print a dataframe where, for each gender, we show the mean, SD, sample size, the t-critical, the SE, the margin of error, and the low/high endpoints of a 95% condifence interval.
 
 ```{r, confint_single_valiables}

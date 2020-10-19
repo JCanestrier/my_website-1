@@ -97,11 +97,6 @@ glimpse(omega)</code></pre>
 <div id="relationship-salary---gender" class="section level2">
 <h2>Relationship Salary - Gender ?</h2>
 <p>The data frame <code>omega</code> contains the salaries for the sample of 50 executives in the company. Can we conclude that there is a significant difference between the salaries of the male and female executives?</p>
-<p>Note that we will perform different types of analyses, and check whether they all lead to the same conclusion</p>
-<p>. Confidence intervals
-. Hypothesis testing
-. Correlation analysis
-. Regression</p>
 <p>We will calculate summary statistics on salary by gender. Also, we will create and print a dataframe where, for each gender, we show the mean, SD, sample size, the t-critical, the SE, the margin of error, and the low/high endpoints of a 95% condifence interval.</p>
 <pre class="r"><code># Summary Statistics of salary by gender
 mosaic::favstats (salary ~ gender, data=omega)</code></pre>
