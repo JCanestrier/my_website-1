@@ -23,8 +23,8 @@ movies &amp;lt;- read_csv(here::here(&amp;quot;data&amp;quot;, &amp;quot;movies.
       <pubDate>Tue, 31 Oct 2017 22:42:51 -0500</pubDate>
       
       <guid>/blogs/gapminder/</guid>
-      <description>Let us revisit the Gapminder databaseIn this section, we will use data frames from the worldbank in order analyze the relationships among the following socioeconomic variables:
-Life expectancy at birth (life_expectancy_years.csv)GDP per capita in constant 2010 US$Female fertility: The number of babies per womanPrimary school enrollment as % of children attending primary schoolMortality rate, for under 5, per 1000 live birthsHIV prevalence : The estimated number of people living with HIV per 100 population of age group 15-49.</description>
+      <description>Analysis of movies - IMDB datasetAs a big fan of movies, I couldn’t stop myself from analysing the impact of IMDB ratings. This is exactly what this project is about. We will find out the effect of IMDB ratings on gross revenue, on tickets sold, etc. Have fun reading!
+movies &amp;lt;- read_csv(here::here(&amp;quot;data&amp;quot;, &amp;quot;movies.csv&amp;quot;))glimpse(movies)## Rows: 2,961## Columns: 11## $ title &amp;lt;chr&amp;gt; &amp;quot;Avatar&amp;quot;, &amp;quot;Titanic&amp;quot;, &amp;quot;Jurassic World&amp;quot;, &amp;quot;The Ave.</description>
     </item>
     
     <item>

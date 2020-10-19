@@ -11,8 +11,8 @@ slug: Gapminder
 title: Correlation analysis
 ---
 
-  
-```{r, setup, include = FALSE}
+
+```{r, setup, echo=FALSE}
 knitr::opts_chunk$set(
   message = FALSE, 
   warning = FALSE, 
@@ -22,268 +22,307 @@ options(digits = 3)
 
 # default figure size
 knitr::opts_chunk$set(
-  fig.width=6.5, 
-  fig.height=6.5,
+  fig.width=6.75, 
+  fig.height=6.75,
   fig.align = "center"
 )
 ```
 
 
-```{r load-libraries, include=FALSE}
+```{r load-libraries, warning=FALSE, message=FALSE, echo=FALSE}
 library(tidyverse)  # Load ggplot2, dplyr, and all the other tidyverse packages
 library(mosaic)
 library(ggthemes)
 library(lubridate)
+library(fivethirtyeight)
 library(here)
 library(skimr)
 library(janitor)
-library(httr)
-library(readxl)
 library(vroom)
-library(ggThemeAssist)
-library(knitr)
-library(infer)
-library(kableExtra)
-library(wbstats)
-library(countrycode)
+library(tidyquant)
+library(rvest)
+library(purrr)  
+library(lubridate)
+library(tidytext)
+library(patchwork)
 ```
 
 
-# Let us revisit the Gapminder database
+# Analysis of movies - IMDB dataset
 
-In this section, we will use data frames from the worldbank in order analyze the relationships among the following socioeconomic variables:
-
-- Life expectancy at birth (life_expectancy_years.csv)
-- GDP per capita in constant 2010 US$ 
-- Female fertility: The number of babies per woman
-- Primary school enrollment as % of children attending primary school 
-- Mortality rate, for under 5, per 1000 live births 
-- HIV prevalence : The estimated number of people living with HIV per 100 population of age group 15-49.
-
-```{r, get_data, cache=TRUE}
-
-# load gapminder HIV data
-hiv <- read_csv(here::here("data","adults_with_hiv_percent_age_15_49.csv"))
-life_expectancy <- read_csv(here::here("data","life_expectancy_years.csv"))
-
-# get World bank data using wbstats
-indicators <- c("SP.DYN.TFRT.IN","SE.PRM.NENR", "SH.DYN.MORT", "NY.GDP.PCAP.KD")
-
-
-
-worldbank_data <-  read_csv(here::here("data","worldbank_data.csv"))
-
-# get a dataframe of information regarding countries, indicators, sources, regions, indicator topics, lending types, income levels,  from the World Bank API 
-countries <-  read.csv(here::here("data","countries.csv"))
-
+As a big fan of movies, I couldn't stop myself from analysing the impact of IMDB ratings. This is exactly what this project is about. We will find out the effect of IMDB ratings on gross revenue, on tickets sold, etc. Have fun reading!
+  
+```{r,load_movies, warning=FALSE, message=FALSE}
+movies <- read_csv(here::here("data", "movies.csv"))
+glimpse(movies)
+skim(movies)
+distinct(movies)
 ```
 
-We will work with 3 data frames:
+**Analysis of Dataset:**
 
-* hiv
-* life_expectancy
-* worldbank_data
-
-We can see that hiv and life_expectancy are messy, since they contain values instead of variables in their columns. Since worldbank_data is tidy, it makes sense to tidy the data in order to manipulate it better in our analyses.
-
-```{r, eval = FALSE}
-#glimpse(hiv)
-#glimpse(life_expectancy)
-#glimpse(worldbank_data)
-```
-
-Notice the period of observations within each data frame:
-
-* hiv : 1979 to 2011
-* life_expectancy : 1800 to 2064
-* worldbank_data : 1960 to 2016
-
-Since we are going to study correlations and relationships between these data frames, it makes sense to join the tables and to keep the period between 1960 to 2016.
-```{r, fig.width=6}
-
-#First, we tidy the data
-hiv_pivot <- hiv %>%
-  pivot_longer(cols = c("1979":"2011"),
-               names_to = "date" , 
-               values_to = "hiv_prevalence", 
-               values_drop_na= FALSE)
+We are now looking at a subset of the IMDB Movie Dataset. The variables set is made up of both numeric and character variable types. There are no missing values, shown by both n_missing = 0 and complete_rate = 1 for all variables. 
+However, not all entries are distinct, which is easily explainable for genre and director: Films are subsets of Genres and Directors do not always shoot only one film. The title variable also has not solely distinct variables, which can be explained by same names used for different films.
 
 
-life_expectancy_pivot <- life_expectancy %>%
-  pivot_longer(cols = c("1800":"2100"),
-   names_to = "date" , 
-   values_to = "life_expectancy", 
-   values_drop_na= FALSE)
-
-
-#We convert date into a double in order to perform the left join
-life_expectancy_pivot$date <- as.double(life_expectancy_pivot$date)
-hiv_pivot$date <- as.double(hiv_pivot$date)
-#Left join the three data frames
-hiv_life_wb <- left_join(worldbank_data,life_expectancy_pivot) %>%
-  left_join(.,hiv_pivot) %>%
-#Add a region column, using the countrycode package
-  mutate(region= countrycode(sourcevar = country, origin = "country.name",destination = "region"))
-
-#Display the first five line of the final table
-hiv_life_wb %>% head() %>% kbl(digits = 2) %>%
-kable_material(c("striped","hover")) %>%
-kable_styling(fixed_thead = T, full_width= F)  
-
+**Table with the count of movies by genre, ranked in descending order:**
+```{r, count_genre}
+movies %>%
+  group_by(genre) %>%
+  summarise(count=n())%>%
+  arrange(desc(count))
 ```
 
 
-## The relation between HIV prevalence and life expectancy
+**Table with the average gross earning and budget by genre:** 
+```{r, return_on_budget}
+movies %>%
+  select(genre,gross,budget)%>%
+  group_by(genre)%>%
+  summarise(avg_gross=mean(gross),avg_budget=mean(budget))%>%
+  mutate(return_on_budget=avg_gross/avg_budget)%>%
+  arrange(desc(return_on_budget))
+```
 
-Let us study the relation between HIV prevalence and life expectancy
+**Table that shows the top 15 directors who have created the highest gross revenue in the box office:**
+```{r, director_stats}
+movies %>%
+  group_by(director)%>%
+  summarise(total=sum(gross),mean=mean(gross),median=median(gross),standard_deviation=STDEV(gross))%>%
+  top_n(15,total)%>%
+  arrange(desc(total))
+```
+
+**Table that describes how ratings are distributed by genre:**
+```{r, ratings}
+
+movies %>%
+  group_by(genre)%>%
+  summarise(average_rating=mean(rating),min_rating=min(rating),max_rating=max(rating),
+            median_rating=median(rating),standard_deviation=STDEV(gross))%>%
+  arrange(desc(average_rating))
+
+movies %>%
+  group_by(genre)%>%
+  ggplot(aes(x=rating, color=genre))+
+    geom_density(position="identity")+
+    labs(title="Distribution of ratings among different genres",
+       subtitle = "Density plot showing ratings among 17 genres", 
+       x = "Rating on a scale from 0 to 10",
+       y = "Density") +
+    theme_hc()
+```
+
+  
+**Relationship between Gross Revenue & Facebook Likes:**  
+  
+```{r, gross_on_fblikes}
+movies %>%
+  ggplot(aes(x=cast_facebook_likes,y=gross)) +
+      geom_point() +
+      geom_smooth(method = lm) +
+      xlim(c(0,125000)) +
+      ylim(c(0,500000000)) +
+      labs(title = "Facebook Likes and Gross Revenue",
+        subtitle = "Scatter plot showing relationship between facebook likes and gross revenue", 
+        x = "Number of facebook likes",
+        y = "Gross Revenue collected") +
+      theme_hc()
+
+```
+```{r}
+
+cor.test(cast_facebook_likes ~ gross, data = movies)
+
+```
+The pearson correlation coefficient between facebook likes and gross revenue collected is 0.213, thus showing how facebook likes are not a reliable indicator of the gross revenue to be collected from a film.
+
+
+**Relationship between Gross Revenue & Budget:**  
+
+```{r, gross_on_budget}
+movies %>%
+  ggplot(aes(x=budget,y=gross))+
+  geom_point()+
+  geom_smooth(method = lm)+
+  labs(title="Budget and Gross Revenue Collected",
+       subtitle = "Scatter plot showing relationship between budget and gross revenue", 
+       x = "Budget for film",
+       y = "Gross Revenue Collected") +
+  theme_hc()
+
+
+```
+```{r}
+
+cor.test(budget ~ gross, data = movies)
+
+
+```
+A film's budget is a better indicator of gross revenue collected than a film's facebook likes. This is both deductible from the more positively correlated scatter plot as well from the correlation test that showed a 0.641 correlation. 
+
+
+**Relationship between Gross Revenue & IMDB Ratings:**  
+
+```{r, gross_on_rating}
+movies %>%
+  ggplot(aes(x=rating,y=gross))+
+  geom_point()+
+  geom_smooth()+
+  labs(title="IMDB ratings and Gross revenue ",
+       subtitle = "Scatter plot showing relationship between IMDB ratings and gross revenue", 
+       x = "IMDB Ratings on scale from 0 to 10",
+       y = "Gross Revenue Collected") +
+  theme_hc()
+```
 
 ```{r}
 
-ggplot(hiv_life_wb,aes(x=hiv_prevalence,y=life_expectancy)) +
-  geom_smooth() +
-  geom_point(alpha=0.2)+
-  labs(title="HIV prevalence is negatively correlated with life expectancy",subtitle="Relationship between HIV prevalence and life expectancy",x="HIV prevalence (aged 15 to 49)",y="Life expectancy") +
-  theme_bw()
+cor.test(rating ~ gross, data = movies)
+
 ```
+
+Having performed the Pearson correlation, we can deduct IMDB Ratings to be a weak indicator of gross revenue. We would argue that in today's movie industry, aspects like digital and physical marketing, PR and premieres are more important contributors to visibility. 
+
+Furthermore, we have performed a logarithmic analysis so that all data was to be included in the analysis.
+
+# IMDB ratings: Differences between directors
+
+Recall the IMBD ratings data. We will explore whether the mean IMDB rating for Steven Spielberg and Tim Burton are the same or not. Below you will see the graph performed by the professor, which we will recreate. 
+
+
+```{r directors, echo=FALSE, out.width="100%"}
+
+#Read the image file within the local environment.
+knitr::include_graphics(here::here("images", "directors.png"), error = FALSE)
+
+```
+
+> Before anything, write down the null and alternative hypotheses, as well as the resulting test statistic and the associated t-stat or p-value. 
+>
+H0: Mean IMDB rating for Steven Spielberg and Tim Burton are NOT significantly different.
+H1: Mean IMDB rating for Steven Spielberg and Tim Burton are significantly different.
+
+*Here we examine the data set*
+
+```{r load-movies-data}
+movies <- read_csv(here::here("data", "movies.csv"))
+glimpse(movies)
+
+#We skim for missing values
+skim(movies)
+```
+
+
+## Ratings on Steven Spielberg's Films
+
 
 ```{r}
-ggplot(hiv_life_wb,aes(x=hiv_prevalence,y=life_expectancy)) +
-  geom_smooth(method="gam") +
-  geom_point(alpha=0.2)+
-  labs(title="Relationship between HIV prevalence and life expectancy by region",subtitle="The relationship is not obvious in all regions!",x="HIV prevalence (aged 15 to 49)",y="Life expectancy") +
-  theme_bw() +
-  facet_wrap(~region,scales="free")
+#creating the new data set
+CI_steve <- movies %>%
+  filter(director=="Steven Spielberg") %>% 
+  summarise(mean_rating = mean(rating),
+            sd_rating = sd(rating),
+            count = n(),
+            se_rating = sd_rating/sqrt(count),
+            t_critical = qt(0.975, count-1), 
+            margin_of_error = t_critical * se_rating,
+            lower = mean_rating - t_critical * se_rating,
+            upper = mean_rating + t_critical * se_rating
+            )%>% 
+ add_column(name="Steven Spielberg")
 
-#We clean the NAs within our data frame in order to calculate the correlation coefficient
-hiv_life_wb_cleaned <- na.omit(hiv_life_wb)
-cor(hiv_life_wb_cleaned$hiv_prevalence,hiv_life_wb_cleaned$life_expectancy)
+#t.test to get CI Steve
+steve_ratings <- movies %>%
+  filter(director=="Steven Spielberg") %>% 
+  select(rating,director)
+
+t.test(steve_ratings$rating, data=steve_ratings)
 
 ```
-> Overall, HIV prevalence and life expectancy are negatively correlated (ρ=-0.585) However, this may not be a direct causal effect, as HIV prevalence might be strongly correlated with bad sanitary conditions and other diseases. This is further shown in the facetted scatterplots : the relationship seems clear in regions like Sub-Saharan Africa, but is less obvious in East Asia & Pacific, indicating that other variables need to be taken into account.
 
 
-## The relationship between fertility rate and GDP per capita
+## Ratings on Tim Burton's Films
+
 
 ```{r}
+#creating the new data set
+CI_tim <- movies %>%
+  filter(director=="Tim Burton") %>% 
+  summarise(mean_rating = mean(rating),
+            sd_rating = sd(rating),
+            count = n(),
+            se_rating = sd_rating/sqrt(count),
+            t_critical = qt(0.975, count-1), 
+            margin_of_error = t_critical * se_rating,
+            lower = mean_rating - t_critical * se_rating,
+            upper = mean_rating + t_critical * se_rating
+            ) %>% 
+ add_column(name="Tim Burton")
 
-ggplot(hiv_life_wb,aes(x=NY.GDP.PCAP.KD,y=SP.DYN.TFRT.IN)) +
-  geom_point(alpha=0.2,size=0.5)+
-  geom_smooth(method="lm") +
-  labs(title="High socioeconomic classes have better access to contraception",subtitle="Relationship between GDP per capita and fertility rate in each region",x="GDP per capita",y="Fertility rate") +
-  theme_bw()+
-  facet_wrap(~region,scales="free")
+#t.test to get CI Tim
+tim_ratings <- movies %>%
+  filter(director=="Tim Burton") %>% 
+  select(rating,director)
 
-#Calculate the correlation coefficient
-cor(hiv_life_wb_cleaned$NY.GDP.PCAP.KD,hiv_life_wb_cleaned$SP.DYN.TFRT.IN)
-
-
-```
-
-> Fertility and GDP per capita are negatively correlated, mainly in the poorest regions such as Sub-Saharan Africa and South Asia, which display the steepest slopes. One interpretation would be that higher socio-economic classes tend to have better access to healthcare and can afford contraceptives. Moreover, the correlation coefficient between the two variables is -0.463, which further proves this relationship.
-
-
-## In relative terms, East Asia & Pacific is the region that most misses HIV data
-Data may be missing in some countries,so we will check which regions have the most observations with missing data, mainly for the HIV variable.
-
-We will conduct the following analysis in absolute and relative terms :
-
-```{r}
-
-#Filter years between 1979 and 2011 to avoid unnecessary NAs since HIV data is only available within this time frame.
-hiv_missing <- hiv_life_wb %>%
-  group_by(region) %>%
-  filter(date>=1979) %>%
-  filter(date<=2011)  %>%
-##Calulate the absolute number of missing data and the proportion relative to the number of cells.
-  summarize(hiv_na = sum(is.na(hiv_prevalence)),proportion= round(hiv_na/n(),digits=3)) %>%
-  arrange(desc(hiv_na))
-
-#Plot of absolute values
-ggplot(hiv_missing,aes(x=reorder(region,hiv_na),y=hiv_na)) + 
-  geom_col(fill="steelblue") + 
-  theme_bw() +
-  coord_flip() +
-  labs(title="Europe & Central Asia is the region that most misses HIV data",subtitle="Number of missing HIV prevalence observations per region", y="HIV missing data",x="")  +
-  geom_text(aes(label=hiv_na), vjust=0.5,hjust=1.5,angle=0, color="white", size=4)
-
-#Plot of proportion 
-ggplot(hiv_missing,aes(x=reorder(region,proportion),y=proportion)) + 
-  geom_col(fill="steelblue") + 
-  theme_bw() +
-  coord_flip() +
-  labs(title="In relative terms, East Asia & Pacific is the region\nthat most misses HIV data",subtitle="Proportion of missing HIV prevalence observations per region",y="HIV missing data",x="")  +
-  geom_text(aes(label=scales::percent(proportion)), vjust=0.5,hjust=1.5,angle=0, color="white", size=4) 
-
-
+t.test(tim_ratings$rating, data=tim_ratings)
 
 ```
 
-> The region that most lacks HIV data is Europe & Central Asia. However, it is more relevant to compare missing data with the number of values within the data frame, since regions do not have the same number of countries. The second analysis indicates that the region with the greatest missing HIV data is East Asia & Pacific (74.1% of missing data)
+##Visualization of confidence intervals for both directors
 
 
-## Top 5 countries with the greatest/lowest decrease in mortality rate per region
+```{r,fig.width=9,fig.height=5.5}
 
-Under-five mortality is a big concern, especially in the poorest regions of the world. Thus, it would be relevant to study its evolution between 1960 and 2016 for each region. We will find the top 5 countries that have seen the greatest improvement, as well as those 5 countries where mortality rates have had the least improvement or even deterioration. Note that to have a logical comparison, countries that do not have data in 1960 or in 2016 will not be displayed.
+#Join the two datasets regarding CI on both directors.
 
-```{r,fig.width=12, fig.height= 10}
+comp_rating <- full_join(CI_steve,CI_tim)
 
-#We filter the data between 1960 (initial year) and 2016 (final year) and we untidy it
-intermediary <- hiv_life_wb %>%
-                select(c("country","region","date","SH.DYN.MORT")) %>% 
-                filter(date== "1960"| date=="2016") %>%
-                pivot_wider(names_from="date", values_from="SH.DYN.MORT")
-         
-colnames(intermediary) = c("country","region","initial","final")
+comp_rating
 
-intermediarytwo <- intermediary %>% 
-mutate(rate_of_change=(final-initial)/initial) %>% #We create a delta column, representing the rate of change
-group_by(region) %>%
-summarize(country,rate_of_change) %>%
-arrange(region,desc(rate_of_change))
-
-
-#We filter the top 5 per region
-top_five <- intermediarytwo %>%
-            slice_min(order_by= rate_of_change,n=5) %>%
-            summarize(country,rate_of_change)
-
-ggplot(top_five,aes(x=reorder(country,rate_of_change),y=abs(rate_of_change))) +
-  geom_col(fill="steelblue") + coord_flip()+ facet_wrap(~region,scales="free") + 
-  labs(title="South Korea has had the greatest decrease in mortality rate over the last 50 years ",subtitle="Top 5 countries with the greatest decrease in mortality rate per region ",y="Change in mortality rate between 1960 and 2016",x="") +
-  geom_text(aes(label=scales::percent(rate_of_change)), vjust=1,hjust=1,angle=0, color="white", size=3) 
-
-#We filter the bottom 5 per region
-bottom_five <- intermediarytwo %>%
-    slice_max(order_by= rate_of_change,n=5) %>%
-  summarize(country,rate_of_change)
-
-
-ggplot(bottom_five,aes(x=reorder(country,rate_of_change),y=abs(rate_of_change))) + geom_col(fill="steelblue") + coord_flip()+ facet_wrap(~region,scales="free") + labs(title="Lesotho has had the worst decrease in mortality rate over the last 50 years",y="Change in mortality rate between 1960 and 2016",subtitle="Top 5 countries with the lowest decrease in mortality rate per region",x="") +geom_text(aes(label=scales::percent(rate_of_change)), vjust=1,hjust=1,angle=0, color="white", size=3) 
-
-```
-
-> It is worth mentioning the main limit of this analysis : the most advanced countries had the lowest margin of improvement. Thus, it is not very surprising to see France in the 5 countries that have evolved the least between 1960 and 2016. Moreover, as we said earlier, many countries do not have data for this specific time frame, which may generate a bias in the study. Taking the first and the last available data for each country could have been a solution, but it would have generated another bias since the years of comparison would be different for each country. Furthermore, there may be duplicates within regions when the amount of countries with available data is smaller than five, such as in North America.
-
-
-## Relationship between primary school enrollment and fertility rate
-
-Finally, a last interesting analysis would be to study the relationship between primary school enrollment and fertility rate.
-
-```{r}
-
-ggplot(hiv_life_wb,aes(x=SE.PRM.NENR,y=SP.DYN.TFRT.IN)) +
-  geom_smooth() +
-  geom_point(alpha=0.2)+
-  labs(title="Large families have way smaller primary school enrollment rates",subtitle="Relationship between primary school enrollment and fertility rate",x="Primary school enrollment",y="Fertility rate") +
-  theme_bw()+
-  facet_wrap(~region,scales="free")
-
-#We calculate the correlation coefficient
-cor(hiv_life_wb_cleaned$SE.PRM.NENR,hiv_life_wb_cleaned$SP.DYN.TFRT.IN)
-
-
+#Visualize the CIs using ggplot. 
+comp_rating %>%
+  ggplot(aes(x=mean_rating,
+             y=reorder(name,mean_rating))) +
+  geom_point(color=c("#FA766D","#06BFC4"),
+             size=4) +
+  geom_errorbar(aes(xmin=lower,xmax=upper),
+                width=0.07,
+                color=c("#FA766D","#06BFC4"),
+                size=1.5) +
+  
+  #We add the grey area to show the overlap.
+  geom_rect(mapping=aes(xmin = 7.27, xmax = 7.33, ymin = -Inf, ymax = Inf),
+            fill="#C8C8C8",
+            alpha=0.4) +
+  
+  #We add the labels
+  geom_text(aes(label=round(lower,2)), 
+            vjust=-1.5,
+            hjust=3,
+            angle=0, 
+            color="black", 
+            size=4) +
+  geom_text(aes(label=round(upper,2)), 
+            vjust=-1.5,
+            hjust=-2,
+            angle=0, 
+            color="black", 
+            size=4) +
+  geom_text(aes(label=round(mean_rating,2)), 
+            vjust=-2,
+            colour= "black", 
+            size= 5) +
+  
+  #We add the theme and titles.
+  theme_minimal()+
+  labs(title="Spielberg's & Burton's confidence intervals overlap",
+       subtitle = "95% confidence interval overlap",
+       x= "IMDB Rating scale", 
+       y="") + 
+  
+  #We add a frame around the ggplot.
+   theme(panel.background = element_rect(colour = "black", size=1))
+  
 
 ```
-
-> There seems to be a very clear negative correlation between primary school enrollment and fertility rate for all regions ((ρ=-0.793). We have seen previously that GDP per capita and fertility rate were negatively correlated. Thus, the poorest families tend to have more children. These children may not have access to education due to financial restrictions or may even be constrained to work instead of attending school. This is usually the case in rural areas, and it would be relevant to further analyze the link between the % of rural population and fertility.
-
