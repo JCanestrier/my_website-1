@@ -1,11 +1,5 @@
-[context.production.environment]
-  HUGO_VERSION = "0.31"
 
-[context.deploy-preview.environment]
-  HUGO_VERSION = "0.31"
-blogdown :: hugo_version()
-
-[build] 
+  [build] 
   publish = "public"
   command = "hugo"
 
@@ -17,7 +11,7 @@ blogdown :: hugo_version()
   HUGO_ENV = "production"
   
 [context.branch-deploy.environment]
-  HUGO_VERSION = "0.75.1" 
+  HUGO_VERSION = "0.75.1" # if older, use format: 0.53 (no trailing zero)
 
 [context.deploy-preview.environment]
   HUGO_VERSION = "0.75.1"
