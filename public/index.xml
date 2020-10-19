@@ -18,22 +18,22 @@ movies &amp;lt;- read_csv(here::here(&amp;quot;data&amp;quot;, &amp;quot;movies.
     </item>
     
     <item>
-      <title>Pay Discrimination</title>
-      <link>/blogs/discrimination/</link>
-      <pubDate>Tue, 31 Oct 2017 22:42:51 -0500</pubDate>
-      
-      <guid>/blogs/discrimination/</guid>
-      <description>Omega Group plc- Pay DiscriminationAt the last board meeting of Omega Group Plc., the headquarters of a large multinational company, the issue was raised that women were being discriminated in the company, in the sense that the salaries were not the same for male and female executives. A quick analysis of a sample of 50 employees (of which 24 men and 26 women) revealed that the average salary for men was about 8,700 higher than for women.</description>
-    </item>
-    
-    <item>
-      <title>Relationship between socioeconomic variables</title>
+      <title>Correlation analysis</title>
       <link>/blogs/gapminder/</link>
       <pubDate>Tue, 31 Oct 2017 22:42:51 -0500</pubDate>
       
       <guid>/blogs/gapminder/</guid>
       <description>Let us revisit the Gapminder databaseIn this section, we will use data frames from the worldbank in order analyze the relationships among the following socioeconomic variables:
 Life expectancy at birth (life_expectancy_years.csv)GDP per capita in constant 2010 US$Female fertility: The number of babies per womanPrimary school enrollment as % of children attending primary schoolMortality rate, for under 5, per 1000 live birthsHIV prevalence : The estimated number of people living with HIV per 100 population of age group 15-49.</description>
+    </item>
+    
+    <item>
+      <title>Pay Discrimination</title>
+      <link>/blogs/discrimination/</link>
+      <pubDate>Tue, 31 Oct 2017 22:42:51 -0500</pubDate>
+      
+      <guid>/blogs/discrimination/</guid>
+      <description>Omega Group plc- Pay DiscriminationAt the last board meeting of Omega Group Plc., the headquarters of a large multinational company, the issue was raised that women were being discriminated in the company, in the sense that the salaries were not the same for male and female executives. A quick analysis of a sample of 50 employees (of which 24 men and 26 women) revealed that the average salary for men was about 8,700 higher than for women.</description>
     </item>
     
     <item>
