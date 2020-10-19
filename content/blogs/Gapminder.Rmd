@@ -9,6 +9,7 @@ image: Gapminder.jpg
 keywords: ""
 slug: Gapminder
 title: Relationship between socioeconomic variables
+
 ---
 
   
@@ -213,8 +214,6 @@ ggplot(hiv_missing,aes(x=reorder(region,proportion),y=proportion)) +
   coord_flip() +
   labs(title="In relative terms, East Asia & Pacific is the region\nthat most misses HIV data",subtitle="Proportion of missing HIV prevalence observations per region",y="HIV missing data",x="")  +
   geom_text(aes(label=scales::percent(proportion)), vjust=0.5,hjust=1.5,angle=0, color="white", size=4) 
-
-
 
 
 
