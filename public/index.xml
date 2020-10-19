@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Portfolio website for Leonie von Loeper</title>
+    <link>/</link>
+    <description>Recent content on Portfolio website for Leonie von Loeper</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-us</language>
+    <lastBuildDate>Tue, 31 Oct 2017 22:42:51 -0500</lastBuildDate><atom:link href="/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Analysis of IMDB Ratings</title>
+      <link>/blogs/imdb/</link>
+      <pubDate>Tue, 31 Oct 2017 22:42:51 -0500</pubDate>
+      
+      <guid>/blogs/imdb/</guid>
+      <description>Analysis of movies - IMDB datasetAs a big fan of movies, I couldn’t stop myself from analysing the impact of IMDB ratings. This is exactly what this project is about. We will find out the effect of IMDB ratings on gross revenue, on tickets sold, etc. Have fun reading!
+movies &amp;lt;- read_csv(here::here(&amp;quot;data&amp;quot;, &amp;quot;movies.csv&amp;quot;))glimpse(movies)## Rows: 2,961## Columns: 11## $ title &amp;lt;chr&amp;gt; &amp;quot;Avatar&amp;quot;, &amp;quot;Titanic&amp;quot;, &amp;quot;Jurassic World&amp;quot;, &amp;quot;The Ave.</description>
+    </item>
+    
+    <item>
+      <title>Pay Discrimination</title>
+      <link>/blogs/discrimination/</link>
+      <pubDate>Tue, 31 Oct 2017 22:42:51 -0500</pubDate>
+      
+      <guid>/blogs/discrimination/</guid>
+      <description>Omega Group plc- Pay DiscriminationAt the last board meeting of Omega Group Plc., the headquarters of a large multinational company, the issue was raised that women were being discriminated in the company, in the sense that the salaries were not the same for male and female executives. A quick analysis of a sample of 50 employees (of which 24 men and 26 women) revealed that the average salary for men was about 8,700 higher than for women.</description>
+    </item>
+    
+    <item>
+      <title>Relationship between socioeconomic variables</title>
+      <link>/blogs/gapminder/</link>
+      <pubDate>Tue, 31 Oct 2017 22:42:51 -0500</pubDate>
+      
+      <guid>/blogs/gapminder/</guid>
+      <description>Let us revisit the Gapminder databaseIn this section, we will use data frames from the worldbank in order analyze the relationships among the following socioeconomic variables:
+Life expectancy at birth (life_expectancy_years.csv)GDP per capita in constant 2010 US$Female fertility: The number of babies per womanPrimary school enrollment as % of children attending primary schoolMortality rate, for under 5, per 1000 live birthsHIV prevalence : The estimated number of people living with HIV per 100 population of age group 15-49.</description>
+    </item>
+    
+    <item>
+      <title>US Elections - Deep Dive</title>
+      <link>/blogs/elections/</link>
+      <pubDate>Tue, 31 Oct 2017 22:42:51 -0500</pubDate>
+      
+      <guid>/blogs/elections/</guid>
+      <description>Trump’s Approval Margins gained stability over time.We will now calculate the average net approval rate (approve- disapprove) for each week since Trump got into office. We will plot the net approval, along with its 95% confidence interval.
+# Import approval polls dataapproval_polllist &amp;lt;- read_csv(here::here(&amp;#39;data&amp;#39;, &amp;#39;approval_polllist.csv&amp;#39;))# or directly off fivethirtyeight website# approval_polllist &amp;lt;- read_csv(&amp;#39;https://projects.fivethirtyeight.com/trump-approval-data/approval_polllist.csv&amp;#39;) glimpse(approval_polllist)## Rows: 15,619## Columns: 22## $ president &amp;lt;chr&amp;gt; &amp;quot;Donald Trump&amp;quot;, &amp;quot;Donald Trump&amp;quot;, &amp;quot;Donald Trump&amp;quot;,.</description>
+    </item>
+    
+    <item>
+      <title>Hello R Markdown</title>
+      <link>/post/2015-07-23-r-rmarkdown/</link>
+      <pubDate>Thu, 23 Jul 2015 21:13:14 -0500</pubDate>
+      
+      <guid>/post/2015-07-23-r-rmarkdown/</guid>
+      <description>R MarkdownThis is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see http://rmarkdown.rstudio.com.
+You can embed an R code chunk like this:
+summary(cars)## speed dist ## Min. : 4.0 Min. : 2.00 ## 1st Qu.:12.0 1st Qu.: 26.00 ## Median :15.0 Median : 36.00 ## Mean :15.4 Mean : 42.98 ## 3rd Qu.</description>
+    </item>
+    
+  </channel>
+</rss>

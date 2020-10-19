@@ -1,0 +1,330 @@
+---
+categories:
+- ""
+- ""
+date: "2017-10-31T22:42:51-05:00"
+description: Correlation Analysis
+draft: false
+image: imdb.png
+keywords: ""
+slug: IMDB
+title: Analysis of IMDB Ratings
+---
+
+
+
+```{r, setup, echo=FALSE}
+knitr::opts_chunk$set(
+  message = FALSE, 
+  warning = FALSE, 
+  tidy=FALSE,     # display code as typed
+  size="small")   # slightly smaller font for code
+options(digits = 3)
+
+# default figure size
+knitr::opts_chunk$set(
+  fig.width=6.75, 
+  fig.height=6.75,
+  fig.align = "center"
+)
+```
+
+
+```{r load-libraries, warning=FALSE, message=FALSE, echo=FALSE}
+library(tidyverse)  # Load ggplot2, dplyr, and all the other tidyverse packages
+library(mosaic)
+library(ggthemes)
+library(lubridate)
+library(fivethirtyeight)
+library(here)
+library(skimr)
+library(janitor)
+library(vroom)
+library(tidyquant)
+library(rvest)
+library(purrr)  
+library(lubridate)
+library(tidytext)
+library(patchwork)
+```
+
+
+# Analysis of movies - IMDB dataset
+
+As a big fan of movies, I couldn't stop myself from analysing the impact of IMDB ratings. This is exactly what this project is about. We will find out the effect of IMDB ratings on gross revenue, on tickets sold, etc. Have fun reading!
+  
+```{r,load_movies, warning=FALSE, message=FALSE}
+movies <- read_csv(here::here("data", "movies.csv"))
+glimpse(movies)
+skim(movies)
+distinct(movies)
+```
+
+**Analysis of Dataset:**
+
+We are now looking at a subset of the IMDB Movie Dataset. The variables set is made up of both numeric and character variable types. There are no missing values, shown by both n_missing = 0 and complete_rate = 1 for all variables. 
+However, not all entries are distinct, which is easily explainable for genre and director: Films are subsets of Genres and Directors do not always shoot only one film. The title variable also has not solely distinct variables, which can be explained by same names used for different films.
+
+
+**Table with the count of movies by genre, ranked in descending order:**
+```{r, count_genre}
+movies %>%
+  group_by(genre) %>%
+  summarise(count=n())%>%
+  arrange(desc(count))
+```
+
+
+**Table with the average gross earning and budget by genre:** 
+```{r, return_on_budget}
+movies %>%
+  select(genre,gross,budget)%>%
+  group_by(genre)%>%
+  summarise(avg_gross=mean(gross),avg_budget=mean(budget))%>%
+  mutate(return_on_budget=avg_gross/avg_budget)%>%
+  arrange(desc(return_on_budget))
+```
+
+**Table that shows the top 15 directors who have created the highest gross revenue in the box office:**
+```{r, director_stats}
+movies %>%
+  group_by(director)%>%
+  summarise(total=sum(gross),mean=mean(gross),median=median(gross),standard_deviation=STDEV(gross))%>%
+  top_n(15,total)%>%
+  arrange(desc(total))
+```
+
+**Table that describes how ratings are distributed by genre:**
+```{r, ratings}
+
+movies %>%
+  group_by(genre)%>%
+  summarise(average_rating=mean(rating),min_rating=min(rating),max_rating=max(rating),
+            median_rating=median(rating),standard_deviation=STDEV(gross))%>%
+  arrange(desc(average_rating))
+
+movies %>%
+  group_by(genre)%>%
+  ggplot(aes(x=rating, color=genre))+
+    geom_density(position="identity")+
+    labs(title="Distribution of ratings among different genres",
+       subtitle = "Density plot showing ratings among 17 genres", 
+       x = "Rating on a scale from 0 to 10",
+       y = "Density") +
+    theme_hc()
+```
+
+  
+**Relationship between Gross Revenue & Facebook Likes:**  
+  
+```{r, gross_on_fblikes}
+movies %>%
+  ggplot(aes(x=cast_facebook_likes,y=gross)) +
+      geom_point() +
+      geom_smooth(method = lm) +
+      xlim(c(0,125000)) +
+      ylim(c(0,500000000)) +
+      labs(title = "Facebook Likes and Gross Revenue",
+        subtitle = "Scatter plot showing relationship between facebook likes and gross revenue", 
+        x = "Number of facebook likes",
+        y = "Gross Revenue collected") +
+      theme_hc()
+
+```
+```{r}
+
+cor.test(cast_facebook_likes ~ gross, data = movies)
+
+```
+The pearson correlation coefficient between facebook likes and gross revenue collected is 0.213, thus showing how facebook likes are not a reliable indicator of the gross revenue to be collected from a film.
+
+
+**Relationship between Gross Revenue & Budget:**  
+
+```{r, gross_on_budget}
+movies %>%
+  ggplot(aes(x=budget,y=gross))+
+  geom_point()+
+  geom_smooth(method = lm)+
+  labs(title="Budget and Gross Revenue Collected",
+       subtitle = "Scatter plot showing relationship between budget and gross revenue", 
+       x = "Budget for film",
+       y = "Gross Revenue Collected") +
+  theme_hc()
+
+
+```
+```{r}
+
+cor.test(budget ~ gross, data = movies)
+
+
+```
+A film's budget is a better indicator of gross revenue collected than a film's facebook likes. This is both deductible from the more positively correlated scatter plot as well from the correlation test that showed a 0.641 correlation. 
+
+
+**Relationship between Gross Revenue & IMDB Ratings:**  
+
+```{r, gross_on_rating}
+movies %>%
+  ggplot(aes(x=rating,y=gross))+
+  geom_point()+
+  geom_smooth()+
+  labs(title="IMDB ratings and Gross revenue ",
+       subtitle = "Scatter plot showing relationship between IMDB ratings and gross revenue", 
+       x = "IMDB Ratings on scale from 0 to 10",
+       y = "Gross Revenue Collected") +
+  theme_hc()
+```
+
+```{r}
+
+cor.test(rating ~ gross, data = movies)
+
+```
+
+Having performed the Pearson correlation, we can deduct IMDB Ratings to be a weak indicator of gross revenue. We would argue that in today's movie industry, aspects like digital and physical marketing, PR and premieres are more important contributors to visibility. 
+
+Furthermore, we have performed a logarithmic analysis so that all data was to be included in the analysis.
+
+# IMDB ratings: Differences between directors
+
+Recall the IMBD ratings data. We will explore whether the mean IMDB rating for Steven Spielberg and Tim Burton are the same or not. Below you will see the graph performed by the professor, which we will recreate. 
+
+
+```{r directors, echo=FALSE, out.width="100%"}
+
+#Read the image file within the local environment.
+knitr::include_graphics(here::here("images", "directors.png"), error = FALSE)
+
+```
+
+> Before anything, write down the null and alternative hypotheses, as well as the resulting test statistic and the associated t-stat or p-value. 
+>
+H0: Mean IMDB rating for Steven Spielberg and Tim Burton are NOT significantly different.
+H1: Mean IMDB rating for Steven Spielberg and Tim Burton are significantly different.
+
+*Here we examine the data set*
+
+```{r load-movies-data}
+movies <- read_csv(here::here("data", "movies.csv"))
+glimpse(movies)
+
+#We skim for missing values
+skim(movies)
+```
+
+
+## Ratings on Steven Spielberg's Films
+
+
+```{r}
+#creating the new data set
+CI_steve <- movies %>%
+  filter(director=="Steven Spielberg") %>% 
+  summarise(mean_rating = mean(rating),
+            sd_rating = sd(rating),
+            count = n(),
+            se_rating = sd_rating/sqrt(count),
+            t_critical = qt(0.975, count-1), 
+            margin_of_error = t_critical * se_rating,
+            lower = mean_rating - t_critical * se_rating,
+            upper = mean_rating + t_critical * se_rating
+            )%>% 
+ add_column(name="Steven Spielberg")
+
+#t.test to get CI Steve
+steve_ratings <- movies %>%
+  filter(director=="Steven Spielberg") %>% 
+  select(rating,director)
+
+t.test(steve_ratings$rating, data=steve_ratings)
+
+```
+
+
+## Ratings on Tim Burton's Films
+
+
+```{r}
+#creating the new data set
+CI_tim <- movies %>%
+  filter(director=="Tim Burton") %>% 
+  summarise(mean_rating = mean(rating),
+            sd_rating = sd(rating),
+            count = n(),
+            se_rating = sd_rating/sqrt(count),
+            t_critical = qt(0.975, count-1), 
+            margin_of_error = t_critical * se_rating,
+            lower = mean_rating - t_critical * se_rating,
+            upper = mean_rating + t_critical * se_rating
+            ) %>% 
+ add_column(name="Tim Burton")
+
+#t.test to get CI Tim
+tim_ratings <- movies %>%
+  filter(director=="Tim Burton") %>% 
+  select(rating,director)
+
+t.test(tim_ratings$rating, data=tim_ratings)
+
+```
+
+##Visualization of confidence intervals for both directors
+
+
+```{r,fig.width=9,fig.height=5.5}
+
+#Join the two datasets regarding CI on both directors.
+
+comp_rating <- full_join(CI_steve,CI_tim)
+
+comp_rating
+
+#Visualize the CIs using ggplot. 
+comp_rating %>%
+  ggplot(aes(x=mean_rating,
+             y=reorder(name,mean_rating))) +
+  geom_point(color=c("#FA766D","#06BFC4"),
+             size=4) +
+  geom_errorbar(aes(xmin=lower,xmax=upper),
+                width=0.07,
+                color=c("#FA766D","#06BFC4"),
+                size=1.5) +
+  
+  #We add the grey area to show the overlap.
+  geom_rect(mapping=aes(xmin = 7.27, xmax = 7.33, ymin = -Inf, ymax = Inf),
+            fill="#C8C8C8",
+            alpha=0.4) +
+  
+  #We add the labels
+  geom_text(aes(label=round(lower,2)), 
+            vjust=-1.5,
+            hjust=3,
+            angle=0, 
+            color="black", 
+            size=4) +
+  geom_text(aes(label=round(upper,2)), 
+            vjust=-1.5,
+            hjust=-2,
+            angle=0, 
+            color="black", 
+            size=4) +
+  geom_text(aes(label=round(mean_rating,2)), 
+            vjust=-2,
+            colour= "black", 
+            size= 5) +
+  
+  #We add the theme and titles.
+  theme_minimal()+
+  labs(title="Spielberg's & Burton's confidence intervals overlap",
+       subtitle = "95% confidence interval overlap",
+       x= "IMDB Rating scale", 
+       y="") + 
+  
+  #We add a frame around the ggplot.
+   theme(panel.background = element_rect(colour = "black", size=1))
+  
+
+```
+

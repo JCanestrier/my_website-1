@@ -1,0 +1,164 @@
+# Site settings
+baseURL = "https://leonievonloeper.netlify.app/"
+languageCode = "en-us"
+title = "Portfolio website for Leonie von Loeper"
+theme = "forty"
+
+# Enter your tracking code to enable Google Analytics
+googleAnalytics = ""
+
+# Enter your disqus shortname to enable comments
+disqusShortname = ""
+
+[params]
+  # You can use Markdown syntax for urls [text](//url.to/source)
+  # To create multi-line text in strings use the """example Text""" format
+  #
+  # All icons using Fontawesome's icon font. Look at fontawesome.io/icons
+  # for more icons. The icons are represented by their corresponding
+  # CSS class.
+
+  # Provide your metadata here.
+  name = "Leonie von Loeper"
+  description = "MFA student at London Business School"
+
+  # Link custom assets relative to /static
+  custom_css = []
+  custom_js  = []
+  favicon    = "favicon.ico"
+
+  # Just a custom image variable, please define it in .md files for content.
+  image = ""
+
+  # 404 error customization
+  [params.error404]
+    heading = "Page couldn't be found"
+    text = "Please visit [this page](/)"
+
+  # Navigation Section
+  [params.navigation]
+    title = "Leonie von Loeper"
+    subtitle = "Portfolio Website"
+    menu = "About"
+    # Optional logo as brand stored in img/
+    # logo = "logo.png"
+
+    [[params.navigation.links]]
+      name = "Home"
+      url = "#"
+
+    [[params.navigation.links]]
+      name = "Blogs"
+      url = "blogs"
+
+  # Banner section
+  [params.banner]
+    # To change the background image on the homepage banner, replace 'banner.jpg' in
+    # the 'static/img' folder.
+    title = "Hi, my name is Leonie"
+    subtitle = "MFA STUDENT BY DAY & VC AND STARTUPS NERD BY NIGHT! "
+    buttonText = "Get to know me"
+
+
+  # Tiles Section
+  [params.tiles]
+    enable = true
+    # Display your showcases here.
+    
+    [[params.tiles.showcase]]
+      title = "Pay Discrimination"
+      subtitle = "Is there a pay gap?"
+      image = "discrimination.jpg"
+      url = "blogs/Discrimination"
+
+    [[params.tiles.showcase]]
+      title = "US Elections - Deep Dive"
+      subtitle = "Trump's approval margins?"
+      image = "elections.jpg"
+      url = "blogs/Elections"
+
+    [[params.tiles.showcase]]
+      title = "Relationship between socioeconomic variables"
+      subtitle = "Correlation analysis"
+      image = "Gapminder.jpg"
+      url = "blogs/Gapminder"
+
+    [[params.tiles.showcase]]
+      title = "Analysis of IMDB Ratings"
+      subtitle = "Correlation analysis"
+      image = "imdb.png"
+      url = "blogs/IMDB"
+
+    # You can make more showcases by copy and pasting the code above
+
+  [params.blog]
+    # All blogs defined in their own files. You can find example blogs
+    # at 'exampleSite/content/blogs'. Copy the 'blogs' folder into the 'content' directory
+    # at the root of this Hugo site.
+    # For more informtion take a look at the README.
+    # To add more blogs just copy and paste the code.
+
+  # Section Type Two
+  [params.two]
+    enable = true
+    title = "About me"
+    subtitle = """I am an Economics graduate from the University cattolica of Milan with deep experience in the fintech industry, who is currently delving into financial analysis at London Business School with the aspiration of bringing meaningful insights and lasting impact to businesses."""
+
+
+  # Contact section
+  [params.contact]
+    enable = true
+    buttonSend = "Send message"
+    buttonClear = "Clear"
+
+    # Since this template is static, the contact form uses www.formspree.io as a
+    # proxy. The form makes a POST request to their servers to send the actual
+    # email. Visitors can send up to a 1000 emails each month for free.
+    #
+    # What you need to do for the setup?
+    #
+    # - set your email address under 'email' below and uncomment
+    # - upload the generated site to your server
+    # - send a dummy email yourself to confirm your account
+    # - click the confirm link in the email from www.formspree.io
+    # - you're done. Happy mailing!
+    # formEmail = "example@domain.com"
+
+    # Contact Section
+    # You can add multiple emails, phone numbers, or addresses
+    # by copying the corresponding map with frontmatter code.
+    [[params.contact.email]]
+    title = "Email"
+    email = "lvonloeper.mfa2021@london.edu"
+
+    [[params.contact.phone]]
+    title = "Phone"
+    phone = "+44 7500 693704"
+
+    [[params.contact.address]]
+    title = "Address"
+    street = "London Business School"
+    city = "London, Sussex Place"
+    country = "United Kingdom"
+
+  # Footer section
+  [params.footer]
+    enable = true
+    copyright = "Leonie von Loeper"
+
+    # Uses font awesome icons
+    [[params.footer.social]]
+      icon = "fa-twitter"
+      url= "https://twitter.com/leonieloeper"
+      label = "Twitter"
+    
+    [[params.footer.social]]
+      icon = "fa-github"
+      url= "https://github.com/Leonielvl"
+      label = "GitHub"
+
+    [[params.footer.social]]
+      icon = "fa-linkedin"
+      url= "https://www.linkedin.com/in/leonie-von-loeper-b5a6ba187/"
+      label = "LinkedIn"
+

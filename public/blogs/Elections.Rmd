@@ -1,0 +1,139 @@
+---
+categories:
+- ""
+- ""
+date: "2017-10-31T22:42:51-05:00"
+description: Trump's approval margins
+draft: false
+image: elections.jpg
+keywords: ""
+slug: Elections
+title: US Elections - Deep Dive
+---
+
+
+
+```{r, setup, include=FALSE}
+knitr::opts_chunk$set(
+  message = FALSE, 
+  warning = FALSE, 
+  tidy=FALSE,     
+  size="small")   
+options(digits = 3)
+
+
+knitr::opts_chunk$set(
+  fig.width=6.75, 
+  fig.height=6.75,
+  fig.align = "center"
+)
+```
+
+
+```{r load-libraries, include=FALSE}
+library(tidyverse)
+library(mosaic)
+library(ggthemes)
+library(lubridate)
+library(here)
+library(skimr)
+library(janitor)
+library(httr)
+library(readxl)
+library(vroom)
+```
+
+## Trump's Approval Margins gained stability over time.
+
+We will now calculate the average net approval rate (approve- disapprove) for each week since Trump got into office. We will plot the net approval, along with its 95% confidence interval.
+
+```{r}
+
+# Import approval polls data
+approval_polllist <- read_csv(here::here('data', 'approval_polllist.csv'))
+
+# or directly off fivethirtyeight website
+# approval_polllist <- read_csv('https://projects.fivethirtyeight.com/trump-approval-data/approval_polllist.csv') 
+
+glimpse(approval_polllist)
+
+# Use `lubridate` to fix dates, as they are given as characters.
+
+approval_polllist_clean <- approval_polllist %>% 
+  mutate(modeldate = mdy(modeldate),
+        startdate = mdy(startdate),
+        enddate = mdy(enddate),
+        createddate = mdy(createddate))
+
+ # Timestamp "mdy_hms" doesn't parse - need to figure this out      
+        
+glimpse(approval_polllist_clean)  
+
+
+ # As shown using glimpse function dates have been changed from character to date format (just need to figure out timestamp)
+
+
+```
+```{r}
+
+trump_analysis <- approval_polllist_clean %>% 
+  mutate(net_approval = adjusted_approve-adjusted_disapprove, year = year(enddate), week = week(enddate))
+
+# Using mutate we have now created a new "net approval" reading & to allow us to plot net approval , we have broken the data down by year & week based on the end date of the poll
+
+# We now need to define and calculate statistics for use in the plot . 
+
+average_net_approval_rate <- trump_analysis %>% 
+  group_by(year,week) %>%
+   dplyr::summarise(mean_approval = mean(net_approval),
+    SD_approval = sd(net_approval),
+    count_approval = n(),
+    t_critical = qt(0.95, count_approval-1),
+    SE_approval = sd(net_approval) / sqrt(n()),
+    margin_approval = t_critical * SE_approval,
+    approval_low = mean_approval - margin_approval,
+    approval_high = mean_approval + margin_approval)
+
+ # We now create the plot along with the CI's 
+
+ggplot(average_net_approval_rate, aes(x = week, y = mean_approval, colour = as.factor(year))) + 
+  geom_point() +
+  geom_line() +
+  facet_wrap(~year) + 
+  geom_hline(yintercept = 0, color = "orange") +
+  scale_color_manual(values = c("tomato", "darkolivegreen4", "cyan2", "darkorchid3")) + 
+  geom_ribbon(aes(ymax = approval_high, ymin = approval_low), alpha = 0.1) +
+  theme(legend.position = "none") +
+  theme_bw() +
+  theme(legend.position="none", aspect.ratio = 1/3) +
+  scale_x_continuous(breaks = c(0, 13, 26, 39, 52),
+                     limits = c(0, 52)) +
+  scale_y_continuous(breaks = c(-20, -17.5, -15, -12.5, -10, -7.5 , -5, -2.5, 0, 2, 5, 7.5),
+                     limits = c(-25, 10)) +
+  labs (title = " Estimating Net Approval for Donald Trump",
+    subtitle = "Weekly average of all polls",
+    x = "Week of the year",
+    y = "Average Net Approval (%)")
+
+print(average_net_approval_rate)
+
+
+
+```
+
+## Confidence Intervals at points in time:
+
+
+```{r}
+
+Week_15_ci <- average_net_approval_rate %>%
+  filter(year==2020, week==c(15,34))
+
+Week_15_ci
+
+```
+
+> The table displays the relevant statistics for weeks 15 and 34 , allowing for a comparison to be made. As shown, the margin approval (t*standard error) in week 34 is stronger than in week 15 , depicting the idea that the confidence interval for week 34 is wider than that of week 15. This becomes particularly apparent when we look at the standard deviation of both weeks. With week 34 having a stronger standard deviation, it's easy to see why it would have a wider confidence interval. This difference could perhaps be explained by the coronavirus pandemic which really started to take hold of America in the weeks after week 15. We can deduce that perhaps trumps approval rate was lower in week 34 in comparison to week 15 due to his poor handling of the pandemic. This is confirmed by the mean approval rate being significantly lower in week 34 than in week 15. However, Trump still has his loyal supporters meaning the spread of the data is wider in week 34 and while his loyal supporters continue to approve , the number of those disapproving increases meaning the spread gets wider. This in turn leads to higher SD,SE and ultimately a wider confidence interval.
+
+
+

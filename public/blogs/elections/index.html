@@ -1,0 +1,275 @@
+<!DOCTYPE HTML>
+<html>
+
+    <head>
+	<meta charset="utf-8" />
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
+	<meta name="description" content="MFA student at London Business School">
+	<meta name="author" content="Leonie von Loeper">
+	<meta name="generator" content="Hugo 0.75.1" />
+	<title>US Elections - Deep Dive &middot; Portfolio website for Leonie von Loeper</title>
+	<!-- Stylesheets -->
+	
+	<link rel="stylesheet" href="/css/main.css"/>
+	
+	
+
+	
+
+	<!-- Custom Fonts -->
+	<link href="/css/font-awesome.min.css" rel="stylesheet" type="text/css">
+
+	
+	<link rel="shortcut icon" type="image/x-icon" href="/favicon.ico">
+	<link rel="icon" type="image/x-icon" href="/favicon.ico">
+	
+
+	<!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+	<!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+	<!--[if lt IE 9]>
+	<script src="js/ie/html5shiv.js"></script>
+	<script src="js/ie/html5shiv.jsrespond.min.js"></script>
+	<![endif]-->
+</head>
+
+    <body>
+
+    <!-- Wrapper -->
+        <div id="wrapper">
+
+            <!-- Header -->
+    <header id="header" class="alt">
+        <a href="/" class="logo"><strong>Leonie von Loeper</strong> <span>Portfolio Website</span></a>
+        <nav>
+            <a href="#menu">About</a>
+        </nav>
+    </header>
+
+<!-- Menu -->
+    <nav id="menu">
+        <ul class="links">
+            
+                <li><a href="/">Home</a></li>
+            
+                <li><a href="/blogs">Blogs</a></li>
+            
+
+        </ul>
+        <ul class="actions vertical">
+            
+            
+        </ul>
+    </nav>
+
+        <!-- Main -->
+            <div id="main" class="alt">
+
+                
+                    <section id="one">
+                        <div class="inner">
+                            <header class="major">
+                                <h1>US Elections - Deep Dive</h1>
+                            </header>
+                            
+                                <span class="image main"><img src="/img/blogs/elections.jpg" alt="" /></span>
+                            
+                            
+
+
+<div id="trumps-approval-margins-gained-stability-over-time." class="section level2">
+<h2>Trump’s Approval Margins gained stability over time.</h2>
+<p>We will now calculate the average net approval rate (approve- disapprove) for each week since Trump got into office. We will plot the net approval, along with its 95% confidence interval.</p>
+<pre class="r"><code># Import approval polls data
+approval_polllist &lt;- read_csv(here::here(&#39;data&#39;, &#39;approval_polllist.csv&#39;))
+
+# or directly off fivethirtyeight website
+# approval_polllist &lt;- read_csv(&#39;https://projects.fivethirtyeight.com/trump-approval-data/approval_polllist.csv&#39;) 
+
+glimpse(approval_polllist)</code></pre>
+<pre><code>## Rows: 15,619
+## Columns: 22
+## $ president           &lt;chr&gt; &quot;Donald Trump&quot;, &quot;Donald Trump&quot;, &quot;Donald Trump&quot;,...
+## $ subgroup            &lt;chr&gt; &quot;All polls&quot;, &quot;All polls&quot;, &quot;All polls&quot;, &quot;All pol...
+## $ modeldate           &lt;chr&gt; &quot;9/27/2020&quot;, &quot;9/27/2020&quot;, &quot;9/27/2020&quot;, &quot;9/27/20...
+## $ startdate           &lt;chr&gt; &quot;1/20/2017&quot;, &quot;1/20/2017&quot;, &quot;1/20/2017&quot;, &quot;1/21/20...
+## $ enddate             &lt;chr&gt; &quot;1/22/2017&quot;, &quot;1/22/2017&quot;, &quot;1/24/2017&quot;, &quot;1/23/20...
+## $ pollster            &lt;chr&gt; &quot;Gallup&quot;, &quot;Morning Consult&quot;, &quot;Ipsos&quot;, &quot;Gallup&quot;,...
+## $ grade               &lt;chr&gt; &quot;B&quot;, &quot;B/C&quot;, &quot;B-&quot;, &quot;B&quot;, &quot;B-&quot;, &quot;C+&quot;, &quot;B+&quot;, &quot;B&quot;, &quot;...
+## $ samplesize          &lt;dbl&gt; 1500, 1992, 1632, 1500, 1651, 1500, 1190, 1500,...
+## $ population          &lt;chr&gt; &quot;a&quot;, &quot;rv&quot;, &quot;a&quot;, &quot;a&quot;, &quot;a&quot;, &quot;lv&quot;, &quot;rv&quot;, &quot;a&quot;, &quot;lv&quot;...
+## $ weight              &lt;dbl&gt; 0.262, 0.680, 0.153, 0.243, 0.142, 0.200, 1.514...
+## $ influence           &lt;dbl&gt; 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,...
+## $ approve             &lt;dbl&gt; 45.0, 46.0, 42.1, 45.0, 42.3, 57.0, 36.0, 46.0,...
+## $ disapprove          &lt;dbl&gt; 45.0, 37.0, 45.2, 46.0, 45.8, 43.0, 44.0, 45.0,...
+## $ adjusted_approve    &lt;dbl&gt; 45.7, 45.3, 43.2, 45.7, 43.4, 51.5, 37.6, 46.7,...
+## $ adjusted_disapprove &lt;dbl&gt; 43.6, 38.3, 43.9, 44.6, 44.5, 44.5, 42.8, 43.6,...
+## $ multiversions       &lt;chr&gt; NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA,...
+## $ tracking            &lt;lgl&gt; TRUE, NA, TRUE, TRUE, TRUE, TRUE, NA, TRUE, TRU...
+## $ url                 &lt;chr&gt; &quot;http://www.gallup.com/poll/201617/gallup-daily...
+## $ poll_id             &lt;dbl&gt; 49253, 49249, 49426, 49262, 49425, 49266, 49260...
+## $ question_id         &lt;dbl&gt; 77265, 77261, 77599, 77274, 77598, 77278, 77272...
+## $ createddate         &lt;chr&gt; &quot;1/23/2017&quot;, &quot;1/23/2017&quot;, &quot;3/1/2017&quot;, &quot;1/24/201...
+## $ timestamp           &lt;chr&gt; &quot;00:45:20 27 Sep 2020&quot;, &quot;00:45:20 27 Sep 2020&quot;,...</code></pre>
+<pre class="r"><code># Use `lubridate` to fix dates, as they are given as characters.
+
+approval_polllist_clean &lt;- approval_polllist %&gt;% 
+  mutate(modeldate = mdy(modeldate),
+        startdate = mdy(startdate),
+        enddate = mdy(enddate),
+        createddate = mdy(createddate))
+
+ # Timestamp &quot;mdy_hms&quot; doesn&#39;t parse - need to figure this out      
+        
+glimpse(approval_polllist_clean)  </code></pre>
+<pre><code>## Rows: 15,619
+## Columns: 22
+## $ president           &lt;chr&gt; &quot;Donald Trump&quot;, &quot;Donald Trump&quot;, &quot;Donald Trump&quot;,...
+## $ subgroup            &lt;chr&gt; &quot;All polls&quot;, &quot;All polls&quot;, &quot;All polls&quot;, &quot;All pol...
+## $ modeldate           &lt;date&gt; 2020-09-27, 2020-09-27, 2020-09-27, 2020-09-27...
+## $ startdate           &lt;date&gt; 2017-01-20, 2017-01-20, 2017-01-20, 2017-01-21...
+## $ enddate             &lt;date&gt; 2017-01-22, 2017-01-22, 2017-01-24, 2017-01-23...
+## $ pollster            &lt;chr&gt; &quot;Gallup&quot;, &quot;Morning Consult&quot;, &quot;Ipsos&quot;, &quot;Gallup&quot;,...
+## $ grade               &lt;chr&gt; &quot;B&quot;, &quot;B/C&quot;, &quot;B-&quot;, &quot;B&quot;, &quot;B-&quot;, &quot;C+&quot;, &quot;B+&quot;, &quot;B&quot;, &quot;...
+## $ samplesize          &lt;dbl&gt; 1500, 1992, 1632, 1500, 1651, 1500, 1190, 1500,...
+## $ population          &lt;chr&gt; &quot;a&quot;, &quot;rv&quot;, &quot;a&quot;, &quot;a&quot;, &quot;a&quot;, &quot;lv&quot;, &quot;rv&quot;, &quot;a&quot;, &quot;lv&quot;...
+## $ weight              &lt;dbl&gt; 0.262, 0.680, 0.153, 0.243, 0.142, 0.200, 1.514...
+## $ influence           &lt;dbl&gt; 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,...
+## $ approve             &lt;dbl&gt; 45.0, 46.0, 42.1, 45.0, 42.3, 57.0, 36.0, 46.0,...
+## $ disapprove          &lt;dbl&gt; 45.0, 37.0, 45.2, 46.0, 45.8, 43.0, 44.0, 45.0,...
+## $ adjusted_approve    &lt;dbl&gt; 45.7, 45.3, 43.2, 45.7, 43.4, 51.5, 37.6, 46.7,...
+## $ adjusted_disapprove &lt;dbl&gt; 43.6, 38.3, 43.9, 44.6, 44.5, 44.5, 42.8, 43.6,...
+## $ multiversions       &lt;chr&gt; NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA,...
+## $ tracking            &lt;lgl&gt; TRUE, NA, TRUE, TRUE, TRUE, TRUE, NA, TRUE, TRU...
+## $ url                 &lt;chr&gt; &quot;http://www.gallup.com/poll/201617/gallup-daily...
+## $ poll_id             &lt;dbl&gt; 49253, 49249, 49426, 49262, 49425, 49266, 49260...
+## $ question_id         &lt;dbl&gt; 77265, 77261, 77599, 77274, 77598, 77278, 77272...
+## $ createddate         &lt;date&gt; 2017-01-23, 2017-01-23, 2017-03-01, 2017-01-24...
+## $ timestamp           &lt;chr&gt; &quot;00:45:20 27 Sep 2020&quot;, &quot;00:45:20 27 Sep 2020&quot;,...</code></pre>
+<pre class="r"><code> # As shown using glimpse function dates have been changed from character to date format (just need to figure out timestamp)</code></pre>
+<pre class="r"><code>trump_analysis &lt;- approval_polllist_clean %&gt;% 
+  mutate(net_approval = adjusted_approve-adjusted_disapprove, year = year(enddate), week = week(enddate))
+
+# Using mutate we have now created a new &quot;net approval&quot; reading &amp; to allow us to plot net approval , we have broken the data down by year &amp; week based on the end date of the poll
+
+# We now need to define and calculate statistics for use in the plot . 
+
+average_net_approval_rate &lt;- trump_analysis %&gt;% 
+  group_by(year,week) %&gt;%
+   dplyr::summarise(mean_approval = mean(net_approval),
+    SD_approval = sd(net_approval),
+    count_approval = n(),
+    t_critical = qt(0.95, count_approval-1),
+    SE_approval = sd(net_approval) / sqrt(n()),
+    margin_approval = t_critical * SE_approval,
+    approval_low = mean_approval - margin_approval,
+    approval_high = mean_approval + margin_approval)
+
+ # We now create the plot along with the CI&#39;s 
+
+ggplot(average_net_approval_rate, aes(x = week, y = mean_approval, colour = as.factor(year))) + 
+  geom_point() +
+  geom_line() +
+  facet_wrap(~year) + 
+  geom_hline(yintercept = 0, color = &quot;orange&quot;) +
+  scale_color_manual(values = c(&quot;tomato&quot;, &quot;darkolivegreen4&quot;, &quot;cyan2&quot;, &quot;darkorchid3&quot;)) + 
+  geom_ribbon(aes(ymax = approval_high, ymin = approval_low), alpha = 0.1) +
+  theme(legend.position = &quot;none&quot;) +
+  theme_bw() +
+  theme(legend.position=&quot;none&quot;, aspect.ratio = 1/3) +
+  scale_x_continuous(breaks = c(0, 13, 26, 39, 52),
+                     limits = c(0, 52)) +
+  scale_y_continuous(breaks = c(-20, -17.5, -15, -12.5, -10, -7.5 , -5, -2.5, 0, 2, 5, 7.5),
+                     limits = c(-25, 10)) +
+  labs (title = &quot; Estimating Net Approval for Donald Trump&quot;,
+    subtitle = &quot;Weekly average of all polls&quot;,
+    x = &quot;Week of the year&quot;,
+    y = &quot;Average Net Approval (%)&quot;)</code></pre>
+<p><img src="/blogs/Elections_files/figure-html/unnamed-chunk-2-1.png" width="648" style="display: block; margin: auto;" /></p>
+<pre class="r"><code>print(average_net_approval_rate)</code></pre>
+<pre><code>## # A tibble: 195 x 10
+## # Groups:   year [4]
+##     year  week mean_approval SD_approval count_approval t_critical SE_approval
+##    &lt;dbl&gt; &lt;dbl&gt;         &lt;dbl&gt;       &lt;dbl&gt;          &lt;int&gt;      &lt;dbl&gt;       &lt;dbl&gt;
+##  1  2017     4          1.33        4.66             46       1.68       0.688
+##  2  2017     5         -1.84        4.22             67       1.67       0.515
+##  3  2017     6         -3.87        5.32             76       1.67       0.610
+##  4  2017     7         -6.48        5.62             84       1.66       0.613
+##  5  2017     8         -6.11        4.82             87       1.66       0.517
+##  6  2017     9         -4.27        4.47             78       1.66       0.506
+##  7  2017    10         -3.95        5.42             89       1.66       0.575
+##  8  2017    11         -7.88        5.52             85       1.66       0.598
+##  9  2017    12         -7.62        6.91             84       1.66       0.754
+## 10  2017    13        -11.7         6.93             91       1.66       0.727
+## # ... with 185 more rows, and 3 more variables: margin_approval &lt;dbl&gt;,
+## #   approval_low &lt;dbl&gt;, approval_high &lt;dbl&gt;</code></pre>
+</div>
+<div id="confidence-intervals-at-points-in-time" class="section level2">
+<h2>Confidence Intervals at points in time:</h2>
+<pre class="r"><code>Week_15_ci &lt;- average_net_approval_rate %&gt;%
+  filter(year==2020, week==c(15,34))
+
+Week_15_ci</code></pre>
+<pre><code>## # A tibble: 2 x 10
+## # Groups:   year [1]
+##    year  week mean_approval SD_approval count_approval t_critical SE_approval
+##   &lt;dbl&gt; &lt;dbl&gt;         &lt;dbl&gt;       &lt;dbl&gt;          &lt;int&gt;      &lt;dbl&gt;       &lt;dbl&gt;
+## 1  2020    15         -8.23        4.38             94       1.66       0.452
+## 2  2020    34        -12.7         5.31             84       1.66       0.580
+## # ... with 3 more variables: margin_approval &lt;dbl&gt;, approval_low &lt;dbl&gt;,
+## #   approval_high &lt;dbl&gt;</code></pre>
+<blockquote>
+<p>The table displays the relevant statistics for weeks 15 and 34 , allowing for a comparison to be made. As shown, the margin approval (t*standard error) in week 34 is stronger than in week 15 , depicting the idea that the confidence interval for week 34 is wider than that of week 15. This becomes particularly apparent when we look at the standard deviation of both weeks. With week 34 having a stronger standard deviation, it’s easy to see why it would have a wider confidence interval. This difference could perhaps be explained by the coronavirus pandemic which really started to take hold of America in the weeks after week 15. We can deduce that perhaps trumps approval rate was lower in week 34 in comparison to week 15 due to his poor handling of the pandemic. This is confirmed by the mean approval rate being significantly lower in week 34 than in week 15. However, Trump still has his loyal supporters meaning the spread of the data is wider in week 34 and while his loyal supporters continue to approve , the number of those disapproving increases meaning the spread gets wider. This in turn leads to higher SD,SE and ultimately a wider confidence interval.</p>
+</blockquote>
+</div>
+
+                        </div>
+                    </section>
+            <!-- Disqus Inject -->
+                
+            </div>
+            
+        <!-- Footer -->
+            
+                <!-- Footer -->
+    <footer id="footer">
+        <div class="inner">
+            <ul class="icons">
+                
+                    <li><a href="https://twitter.com/leonieloeper" class="icon alt fa-twitter" target="_blank"><span class="label">Twitter</span></a></li>
+                
+                    <li><a href="https://github.com/Leonielvl" class="icon alt fa-github" target="_blank"><span class="label">GitHub</span></a></li>
+                
+                    <li><a href="https://www.linkedin.com/in/leonie-von-loeper-b5a6ba187/" class="icon alt fa-linkedin" target="_blank"><span class="label">LinkedIn</span></a></li>
+                
+            </ul>
+            <ul class="copyright">
+                <li>&copy; Leonie von Loeper</li>
+                
+            </ul>
+        </div>
+    </footer>
+
+            
+        </div>
+
+    <!-- Scripts -->
+        <!-- Scripts -->
+    <!-- jQuery -->
+    <script src="/js/jquery.min.js"></script>
+    <script src="/js/jquery.scrolly.min.js"></script>
+    <script src="/js/jquery.scrollex.min.js"></script>
+    <script src="/js/skel.min.js"></script>
+    <script src="/js/util.js"></script>
+
+    
+
+    <!-- Main JS -->
+    <script src="/js/main.js"></script>
+
+    
+
+    
+
+    </body>
+</html>
